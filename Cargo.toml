@@ -1,0 +1,6 @@
+[package]
+name = "mod1-rs"
+version = "0.1.0"
+authors = ["Kerosene2000 <renault.cle@gmail.com>"]
+
+[dependencies]
