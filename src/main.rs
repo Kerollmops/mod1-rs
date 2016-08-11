@@ -6,9 +6,10 @@ mod surface_points;
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use std::borrow::Cow;
 use surface_points::SurfacePoints;
 
-fn main() {
+fn get_surfaces_points() -> Vec<SurfacePoints> {
     let mut surfaces_points = Vec::new();
     let args = env::args().skip(1);
     for arg in args {
@@ -24,5 +25,10 @@ fn main() {
             Err(err) => printlnc!(red: "{}: {}", arg, err)
         }
     }
+    surfaces_points
+}
+
+fn main() {
+    let surfaces_points = get_surfaces_points();
     println!("{:?}", surfaces_points);
 }
