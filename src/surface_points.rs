@@ -1,3 +1,4 @@
+use std::ops::{Deref, DerefMut};
 use std::str::{self, FromStr};
 use nom::{IResult, multispace, digit, line_ending, eof};
 
@@ -54,6 +55,19 @@ pub struct SurfacePoint {
 
 #[derive(Debug)]
 pub struct SurfacePoints(Vec<SurfacePoint>);
+
+impl Deref for SurfacePoints {
+    type Target = Vec<SurfacePoint>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for SurfacePoints {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 impl SurfacePoints {
     // FIXME real error
