@@ -1,42 +1,21 @@
-#[macro_use] extern crate nom;
-#[macro_use] extern crate colorify;
-extern crate ndarray;
+use ndarray::{ArrayBase, Array, Ix};
+use ::surface_points::SurfacePoints;
 
-mod surface_points;
-mod height_map;
+pub struct HeightMap(Array<u32, (Ix, Ix)>); // FIXME i32 for height ???
 
-use std::env;
-use std::fs::File;
-use std::io::Read;
-use surface_points::SurfacePoints;
-use height_map::HeightMap;
+fn inverse_distance_weighting(points: &SurfacePoints, array: &mut Array<u32, (Ix, Ix)>) {
+    //
+}
 
-fn get_surfaces_points() -> Vec<SurfacePoints> {
-    let mut surfaces_points = Vec::new();
-    let args = env::args().skip(1);
-    for arg in args {
-        match File::open(arg.clone()) {
-            Ok(mut file) => {
-                let mut vec = Vec::new();
-                file.read_to_end(&mut vec);
-                match SurfacePoints::from_buffer(&vec) {
-                    Ok(surface_points) => surfaces_points.push(surface_points),
-                    Err(err) => printlnc!(red: "{}: Syntax error", arg)
-                }
-            },
-            Err(err) => printlnc!(red: "{}: {}", arg, err)
-        }
+impl HeightMap {
+    pub fn from_surface_points(sp: &SurfacePoints) -> HeightMap {
+        let mut array = Array::from_elem((256, 256), 0);
+        inverse_distance_weighting(sp, &mut array);
+        HeightMap(array)
     }
-    surfaces_points
 }
 
-fn main() {
-    let surfaces_points = get_surfaces_points();
-    // TODO manage all surfaces points
-    let height_map = HeightMap::from_surface_points(&surfaces_points[0]);
-    // println!("{:?}", surfaces_points);
-}
-//
+
 // float           get_weight(float dist)
 // {
 //     return ((dist == 0) ? (1.f) : (1.f / (dist * dist)));

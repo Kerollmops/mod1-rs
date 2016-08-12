@@ -6,3 +6,4 @@ authors = ["Kero <renault.cle@gmail.com>"]
 [dependencies]
 nom = "1.2"
 colorify = "0.2"
+ndarray = "0.6"

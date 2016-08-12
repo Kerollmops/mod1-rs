@@ -3,6 +3,7 @@ name = "mod1-rs"
 version = "0.1.0"
 dependencies = [
  "colorify 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ndarray 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "nom 1.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -12,10 +13,49 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "itertools"
+version = "0.4.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "matrixmultiply"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "ndarray"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "itertools 0.4.17 (registry+https://github.com/rust-lang/crates.io-index)",
+ "matrixmultiply 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-complex 0.1.33 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "nom"
 version = "1.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
+[[package]]
+name = "num-complex"
+version = "0.1.33"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "num-traits 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "num-traits"
+version = "0.1.34"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
 [metadata]
 "checksum colorify 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "3eb006d3382cc3ca88eecfb3e2f22a8bd5d246507a514d5916c17cd40ad01c59"
+"checksum itertools 0.4.17 (registry+https://github.com/rust-lang/crates.io-index)" = "7ddb83e0e9730d830afba4e6839077948b4efa22075f7cd80a3867ec286c610f"
+"checksum matrixmultiply 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "96b20aff574a5af018a975788fccf82317e3cd44ce2f57fe2eed3df43e03d100"
+"checksum ndarray 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "010ffada8a564422a86a7bc0cebd4184be5c157b8fbc42826bad6b9edeeb49f0"
 "checksum nom 1.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "a5b8c256fd9471521bcb84c3cdba98921497f1a331cbc15b8030fc63b82050ce"
+"checksum num-complex 0.1.33 (registry+https://github.com/rust-lang/crates.io-index)" = "8aabbc079e1855ce8415141fee0ebebf171f56505373b3a966e2716ad7c0e555"
+"checksum num-traits 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)" = "95e58eac34596aac30ab134c8a8da9aa2dc99caa4b4b4838e6fc6e298016278f"
