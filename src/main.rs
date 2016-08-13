@@ -37,5 +37,6 @@ fn main() {
     let surfaces_points = get_surfaces_points();
     // TODO manage all surfaces points
     let height_map = HeightMap::from_surface_points(&surfaces_points[0]);
-    // println!("{:?}", surfaces_points);
+    println!("{:?}", surfaces_points);
+    println!("{:?}", height_map);
 }
