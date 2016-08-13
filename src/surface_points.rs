@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use std::str::{self, FromStr};
-use nom::{IResult, multispace, digit, line_ending, eof};
+use nom::{IResult, multispace, digit, eof};
 
 named!(u32_digit<u32>,
   map_res!(

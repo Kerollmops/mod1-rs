@@ -18,10 +18,13 @@ fn get_surfaces_points() -> Vec<SurfacePoints> {
         match File::open(arg.clone()) {
             Ok(mut file) => {
                 let mut vec = Vec::new();
-                file.read_to_end(&mut vec);
+                if let Err(err) = file.read_to_end(&mut vec) {
+                    printlnc!(red: "{:?}", err);
+                    return surfaces_points;
+                }
                 match SurfacePoints::from_buffer(&vec) {
                     Ok(surface_points) => surfaces_points.push(surface_points),
-                    Err(err) => printlnc!(red: "{}: Syntax error", arg)
+                    Err(_err) => printlnc!(red: "{}: Syntax error", arg)
                 }
             },
             Err(err) => printlnc!(red: "{}: {}", arg, err)
