@@ -28,8 +28,8 @@ fn inverse_distance_weighting(points: &SurfacePoints, array: &mut Array<u32, (Ix
         });
         sum_denominator += weight((0.0 - pos.0).abs());
         sum_denominator += weight((0.0 - pos.1).abs());
-        sum_denominator += weight((array_rows - 1.0 - pos.0).abs()); // FIXME is it rows ?
-        sum_denominator += weight((array_cols - 1.0 - pos.1).abs()); // FIXME is it cols ?
+        sum_denominator += weight((array_rows - 1.0 - pos.0).abs());
+        sum_denominator += weight((array_cols - 1.0 - pos.1).abs());
         *height = (sum_numerator / sum_denominator) as u32;
     }
 }
