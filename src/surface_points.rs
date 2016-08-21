@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use std::str::{self, FromStr};
-use nom::{IResult, multispace, digit, eof};
+use nom::{IResult, multispace, digit, eof, line_ending, not_line_ending};
 
 named!(u32_digit<u32>,
   map_res!(
@@ -10,6 +10,14 @@ named!(u32_digit<u32>,
     ),
     FromStr::from_str
   )
+);
+
+named!(comment,
+    delimited!(
+        char!(';'),
+        not_line_ending,
+        line_ending
+    )
 );
 
 named!(
@@ -22,9 +30,9 @@ named!(
             delimited!(many0!(multispace), char!(','), many0!(multispace)) ~
             y: u32_digit ~
             delimited!(many0!(multispace), char!(','), many0!(multispace)) ~
-            z: u32_digit ~ // FIXME i32 can be used ???
+            z: u32_digit ~
             many0!(multispace) ,
-            || { SurfacePoint{ x: x, y: y, z: z } }
+            || SurfacePoint{ x: x, y: y, z: z }
         ),
         char!(')')
     )
@@ -33,16 +41,24 @@ named!(
 named!(
     surface_points<&[u8], Vec<SurfacePoint> >,
     chain!(
-        sp: many1!(
-            chain!(
-                many0!(multispace) ~
-                sp: surface_point ~
-                many0!(multispace),
-                || sp
-            )
+        sps: fold_many1!(
+            alt_complete!(
+                chain!(
+                    many0!(multispace) ~
+                    sp: surface_point ~
+                    many0!(multispace),
+                    || Some(sp)
+                ) |
+                map!(comment, |_| None)
+            ),
+            Vec::new(),
+            |mut acc: Vec<_>, sp_opt| {
+                if let Some(sp) = sp_opt { acc.push(sp) }
+                acc
+            }
         ) ~
-        eof ,
-        || sp
+        eof,
+        || sps
     )
 );
 
@@ -73,6 +89,7 @@ impl SurfacePoints {
     // FIXME real error
     pub fn from_buffer(buffer: &[u8]) -> Result<SurfacePoints, ()> {
         match surface_points(buffer) {
+            IResult::Done(_rest, ref surface_points) if surface_points.is_empty() => Err(()),
             IResult::Done(_rest, surface_points) => Ok(SurfacePoints(surface_points)),
             _ => Err(())
         }

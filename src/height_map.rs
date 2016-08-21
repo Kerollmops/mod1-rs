@@ -2,7 +2,7 @@ use ndarray::{Array, Ix};
 use ::surface_points::SurfacePoints;
 
 #[derive(Debug)]
-pub struct HeightMap(Array<u32, (Ix, Ix)>); // FIXME i32 for height ???
+pub struct HeightMap(Array<f32, (Ix, Ix)>); // FIXME i32 for height ???
 
 #[inline]
 fn weight(dist: f32) -> f32 {
@@ -13,30 +13,40 @@ fn weight(dist: f32) -> f32 {
     }
 }
 
+#[inline]
 fn distance((a_x, a_y): (f32, f32), (b_x, b_y): (f32, f32)) -> f32 {
-    (((a_x - b_x) * (a_x - b_x)) + ((a_y - b_y) * (a_y - b_y))).sqrt()
+    let dist_x = a_x - b_x;
+    let dist_y = a_y - b_y;
+    let dist = ((dist_x * dist_x) + (dist_y * dist_y)).sqrt();
+    println!("({:?}, {:?}): dist: {}", (a_x, a_y), (b_x, b_y), dist);
+    dist
 }
 
-fn inverse_distance_weighting(points: &SurfacePoints, array: &mut Array<u32, (Ix, Ix)>) {
+fn inverse_distance_weighting(points: &SurfacePoints, array: &mut Array<f32, (Ix, Ix)>) {
     let array_rows = array.cols() as f32;
     let array_cols = array.rows() as f32;
-    for (i, height) in array.indexed_iter_mut() {
-        let pos = (i.0 as f32, i.1 as f32);
+    for (idx, height) in array.indexed_iter_mut() {
+        let idx = (idx.0 as f32, idx.1 as f32);
         let (sum_numerator, mut sum_denominator) = points.iter().fold((0.0, 0.0), |acc, &p| {
-            let weight = weight(distance((p.x as f32, p.y as f32), pos)) * p.z as f32;
-            (acc.0 + weight, acc.1 + weight)
+            let dist = distance((p.x as f32, p.y as f32), idx);
+            let weight = weight(dist);
+            println!("({:?}), weight: {}", p.z, weight);
+            (acc.0 + if dist != 0.0 { weight * p.z as f32 } else { p.z as f32 }
+             , acc.1 + weight)
         });
-        sum_denominator += weight((0.0 - pos.0).abs());
-        sum_denominator += weight((0.0 - pos.1).abs());
-        sum_denominator += weight((array_rows - 1.0 - pos.0).abs());
-        sum_denominator += weight((array_cols - 1.0 - pos.1).abs());
-        *height = (sum_numerator / sum_denominator) as u32;
+        // sum_denominator += weight(idx.0);                            // dist (x, 0)
+        // sum_denominator += weight(idx.1);                            // dist (0, y)
+        // sum_denominator += weight((array_rows - 1.0 - idx.0).abs()); // dist (x_max, 0)
+        // sum_denominator += weight((array_cols - 1.0 - idx.1).abs()); // dist (0, y_max)
+        *height = sum_numerator / sum_denominator;
+        println!("{:?}/{:?}, height: {:?}", sum_numerator, sum_denominator, *height);
+        println!("-------------");
     }
 }
 
 impl HeightMap {
     pub fn from_surface_points(sp: &SurfacePoints) -> HeightMap {
-        let mut array = Array::from_elem((16, 32), 0);
+        let mut array = Array::from_elem((4, 8), 0.0);
         inverse_distance_weighting(sp, &mut array);
         HeightMap(array)
     }
