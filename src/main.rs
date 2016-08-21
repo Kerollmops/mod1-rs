@@ -24,7 +24,7 @@ fn get_surfaces_points() -> Vec<SurfacePoints> {
                 }
                 match SurfacePoints::from_buffer(&vec) {
                     Ok(surface_points) => surfaces_points.push(surface_points),
-                    Err(_err) => printlnc!(red: "{}: Syntax error", arg)
+                    Err(err) => printlnc!(red: "{}: {}", arg, err)
                 }
             },
             Err(err) => printlnc!(red: "{}: {}", arg, err)
@@ -36,7 +36,9 @@ fn get_surfaces_points() -> Vec<SurfacePoints> {
 fn main() {
     let surfaces_points = get_surfaces_points();
     // TODO manage all surfaces points
-    let height_map = HeightMap::from_surface_points(&surfaces_points[0]);
-    println!("{:?}", surfaces_points);
-    println!("{:?}", height_map);
+    for surface_points in surfaces_points {
+        let height_map = HeightMap::from_surface_points(&surface_points);
+        println!("{:?}", surface_points);
+        println!("{:?}", height_map);
+    }
 }

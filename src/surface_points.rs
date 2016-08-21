@@ -1,6 +1,7 @@
+use std::fmt;
 use std::ops::{Deref, DerefMut};
 use std::str::{self, FromStr};
-use nom::{IResult, multispace, digit, eof, line_ending, not_line_ending};
+use nom::{IResult, Err, multispace, digit, eof, line_ending, not_line_ending};
 
 named!(u32_digit<u32>,
   map_res!(
@@ -62,6 +63,31 @@ named!(
     )
 );
 
+pub enum ParsingError<'a> {
+    NoPoint,
+    Unreachable,
+    NomError(Err<&'a [u8], u32>),
+}
+
+const MIN_STR_ERR_LEN: usize = 5;
+
+impl<'a> fmt::Display for ParsingError<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            ParsingError::NoPoint => write!(f, "No point found."),
+            ParsingError::Unreachable => write!(f, "Unreachable."),
+            ParsingError::NomError(Err::Position(_, pos)) => {
+                let len = {
+                    let len = pos.len();
+                    if len < MIN_STR_ERR_LEN { len } else { MIN_STR_ERR_LEN }
+                };
+                write!(f, "\n{}", String::from_utf8_lossy(&pos[..len]))
+            },
+            ParsingError::NomError(ref err) => write!(f, "{}", err)
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct SurfacePoint {
     pub x: u32,
@@ -87,11 +113,12 @@ impl DerefMut for SurfacePoints {
 
 impl SurfacePoints {
     // FIXME real error
-    pub fn from_buffer(buffer: &[u8]) -> Result<SurfacePoints, ()> {
+    pub fn from_buffer(buffer: &[u8]) -> Result<SurfacePoints, ParsingError> {
         match surface_points(buffer) {
-            IResult::Done(_rest, ref surface_points) if surface_points.is_empty() => Err(()),
-            IResult::Done(_rest, surface_points) => Ok(SurfacePoints(surface_points)),
-            _ => Err(())
+            IResult::Done(_, ref sps) if sps.is_empty() => Err(ParsingError::NoPoint),
+            IResult::Done(_, sps) => Ok(SurfacePoints(sps)),
+            IResult::Error(err) => Err(ParsingError::NomError(err)),
+            IResult::Incomplete(_) => Err(ParsingError::Unreachable)
         }
     }
 }
