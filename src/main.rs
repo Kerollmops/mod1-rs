@@ -1,5 +1,7 @@
 #[macro_use] extern crate nom;
 #[macro_use] extern crate colorify;
+#[macro_use] extern crate log;
+extern crate simplelog;
 extern crate ndarray;
 
 mod surface_points;
@@ -8,6 +10,7 @@ mod height_map;
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use simplelog::{TermLogger, LogLevelFilter};
 use surface_points::SurfacePoints;
 use height_map::HeightMap;
 
@@ -34,6 +37,7 @@ fn get_surfaces_points() -> Vec<SurfacePoints> {
 }
 
 fn main() {
+    TermLogger::init(LogLevelFilter::max()).unwrap();
     let surfaces_points = get_surfaces_points();
     // TODO manage all surfaces points
     for surface_points in surfaces_points {

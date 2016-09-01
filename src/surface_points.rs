@@ -77,10 +77,10 @@ impl<'a> fmt::Display for ParsingError<'a> {
             ParsingError::NoPoint => write!(f, "No point found."),
             ParsingError::Unreachable => write!(f, "Unreachable."),
             ParsingError::NomError(Err::Position(_, pos)) => {
-                let len = {
-                    let len = pos.len();
-                    if len < MIN_STR_ERR_LEN { len } else { MIN_STR_ERR_LEN }
-                };
+                let len = if pos.len() < MIN_STR_ERR_LEN {
+                    pos.len()
+                } else { MIN_STR_ERR_LEN };
+
                 write!(f, "\n{}", String::from_utf8_lossy(&pos[..len]))
             },
             ParsingError::NomError(ref err) => write!(f, "{}", err)
